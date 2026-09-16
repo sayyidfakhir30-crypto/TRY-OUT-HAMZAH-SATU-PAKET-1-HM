@@ -100,7 +100,7 @@
     
     <!-- KOTAK STATUS JADWAL UJIAN -->
     <div class="maklumat" id="access-status">
-      <!-- Status diisi oleh JavaScript (Hitung mundur / Dibuka / Ditutup) -->
+      <!-- Status diisi oleh JavaScript -->
     </div>
 
     <div class="maklumat">
@@ -114,7 +114,7 @@
       </ol>
     </div>
 
-    <!-- AREA LOGIN (Disembunyikan jika belum waktunya) -->
+    <!-- AREA LOGIN -->
     <div id="login-form-area" style="display:none;">
       <label for="email-input">Email Anda</label>
       <input type="email" id="email-input" placeholder="nama@email.com">
@@ -177,13 +177,12 @@
 </div>
 
 <script>
-/* ---------- KONFIGURASI JADWAL UJIAN (PERCOBAAN) ---------- */
-// Waktu UTC (Universal Time Coordinated)
-// 11:58:00Z UTC = Pukul 14.58 WAS (Waktu Arab Saudi) = Pukul 18.58 WIB
-// 15:58:00Z UTC = Pukul 18.58 WAS (Waktu Arab Saudi) = Pukul 22.58 WIB
+/* ---------- JADWAL UJIAN: 16.10 WAS / 20.10 WIB ---------- */
+// 13:10:00Z UTC = 16.10 WAS = 20.10 WIB
+// 17:10:00Z UTC = 20.10 WAS = 00.10 WIB
 
-const EXAM_START_UTC = "2026-09-16T11:58:00Z"; 
-const EXAM_END_UTC   = "2026-09-16T15:58:00Z";
+const EXAM_START_UTC = "2026-09-16T13:10:00Z"; 
+const EXAM_END_UTC   = "2026-09-16T17:10:00Z";
 
 const startMs = new Date(EXAM_START_UTC).getTime();
 const endMs = new Date(EXAM_END_UTC).getTime();
@@ -194,22 +193,19 @@ function updateAccessStatus() {
   const loginFormEl = document.getElementById('login-form-area');
   
   if (now < startMs) {
-    // Belum mulai (Countdown)
     const diff = startMs - now;
     const h = Math.floor(diff / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
     
-    statusEl.innerHTML = `<b>Ujian belum dimulai!</b><br>Try Out akan dibuka (Pukul 14.58 WAS / 18.58 WIB) dalam:<br><span class="timer-countdown">${h}j ${m}m ${s}d</span>`;
+    statusEl.innerHTML = `<b>Ujian belum dimulai!</b><br>Try Out akan dibuka (Pukul 16.10 WAS / 20.10 WIB) dalam:<br><span class="timer-countdown">${h}j ${m}m ${s}d</span>`;
     loginFormEl.style.display = 'none';
   } else if (now >= startMs && now <= endMs) {
-    // Sedang berlangsung
-    statusEl.innerHTML = `<b>Ujian telah dibuka!</b><br>Batas waktu login hingga pukul 18.58 WAS / 22.58 WIB.`;
+    statusEl.innerHTML = `<b>Ujian telah dibuka!</b><br>Batas waktu login hingga pukul 20.10 WAS / 00.10 WIB.`;
     statusEl.style.background = 'var(--correct-bg)';
     statusEl.style.borderColor = 'var(--correct-border)';
     loginFormEl.style.display = 'block';
   } else {
-    // Waktu habis
     statusEl.innerHTML = `<span class="closed-text">Waktu login telah ditutup!</span><br>Batas waktu login telah berakhir. Anda tidak dapat lagi masuk ke soal.`;
     statusEl.style.background = 'var(--wrong-bg)';
     statusEl.style.borderColor = 'var(--wrong-border)';
@@ -217,14 +213,13 @@ function updateAccessStatus() {
   }
 }
 setInterval(updateAccessStatus, 1000);
-updateAccessStatus(); // Panggil pertama kali
+updateAccessStatus();
 
 /* ---------- KONFIGURASI SOAL ---------- */
 const HURUF = ["A","B","C","D","E","F"];
 const LVL_LABEL = {mudah:"Mudah", sedang:"Sedang", sulit:"Sulit"};
 const SECTION_LABEL = {masmu:"Istima'", tarakib:"Tarakib", maqru:"Mufrodat"};
 
-/* DATA SOAL TRY OUT 1 */
 const TARAKIB = [
 {lvl:"mudah", soal:"الْكِتَابُ ...... عَلَى الْمَكْتَبِ", opts:["جَمِيلَة","جَمِيلٌ","جَمِيلَانِ","جَمِيلُونَ","جَمِيلَات"], correct:1},
 {lvl:"mudah", soal:"الْمُدَرِّسُ ...... الدَّرْسَ فِي الْفَصْلِ", opts:["تَشْرَحُ","يَشْرَحُ","أَشْرَحُ","يَشْرَحَانِ","نَشْرَحُ"], correct:1},
@@ -408,7 +403,7 @@ const MASMU = [
 const PAGES = [];
 MASMU.forEach((passage, pi)=>{
   PAGES.push({ section:'masmu', lvl:passage.lvl, audio:passage.audio,
-    items: passage.questions.map((q,qi)=>({...q, qid:'masmu-'+pi+'-'+qi})) });
+    items: passage.questions.map((q,qi)=>({...q, qid:'masmu-'+pi-'+'+qi})) });
 });
 for(let i=0;i<TARAKIB.length;i+=5){
   PAGES.push({ section:'tarakib', items: TARAKIB.slice(i,i+5).map((q,idx)=>({...q, qid:'tarakib-'+(i+idx)})) });
